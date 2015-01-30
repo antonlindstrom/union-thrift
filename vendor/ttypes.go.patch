@@ -1,0 +1,29 @@
+--- vendor/thrift/example/ttypes.go	2015-01-30 09:33:41.000000000 +0100
++++ ttypes.go	2015-01-30 08:47:38.000000000 +0100
+@@ -327,14 +327,21 @@
+ }
+ 
+ func (p *Z) Write(oprot thrift.TProtocol) error {
++	if !p.IsSetX() && !p.IsSetY() || p.IsSetX() && p.IsSetY() {
++		return fmt.Errorf("%T write struct required fields not set", p)
++	}
+ 	if err := oprot.WriteStructBegin("Z"); err != nil {
+ 		return fmt.Errorf("%T write struct begin error: %s", p, err)
+ 	}
+-	if err := p.writeField1(oprot); err != nil {
+-		return err
+-	}
+-	if err := p.writeField2(oprot); err != nil {
+-		return err
++	if p.IsSetX() {
++		if err := p.writeField1(oprot); err != nil {
++			return err
++		}
++	}
++	if p.IsSetY() {
++		if err := p.writeField2(oprot); err != nil {
++			return err
++		}
+ 	}
+ 	if err := oprot.WriteFieldStop(); err != nil {
+ 		return fmt.Errorf("write field stop error: %s", err)
